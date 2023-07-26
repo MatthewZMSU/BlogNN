@@ -24,6 +24,12 @@ def _get_words(text: str) -> list[str]:
 
 
 def get_features(request: dict) -> dict:
+    """
+
+    :param request: dict - dict-container for text from user. It essential to provide
+        text via 'message' key
+    :return: dict - features vector provided via 'features'
+    """
     if 'message' not in request:
         raise ValueError('No "message" field in the JSON')
     text = request.get('message')
