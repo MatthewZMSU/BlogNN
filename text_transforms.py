@@ -26,7 +26,7 @@ def _get_words(text: str) -> list[str]:
 def get_features(request: dict) -> dict:
     if 'message' not in request:
         raise ValueError('No "message" field in the JSON')
-    text = request.pop('message')
+    text = request.get('message')
     words = _get_words(text)
     document_words = Counter(words)
 
@@ -38,3 +38,12 @@ def get_features(request: dict) -> dict:
 
     corpus_words.update(set(words).intersection(set(key_words)))
 
+    features = np.zeros(shape=(len(key_words), ), dtype=float)
+    for ind, key in enumerate(key_words):
+        tf = document_words[key] / document_words.total()
+        idf = np.log(total_documents / corpus_words[key])
+        features[ind] = tf * idf
+
+    return {
+        'features': features.tolist()
+    }
