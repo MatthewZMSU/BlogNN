@@ -32,7 +32,7 @@ def get_features(request: dict) -> dict:
 
     with open('corpus.json', 'r') as f:
         corpus_info = json.load(f)
-        total_documents = corpus_info['document_number']
+        total_documents = corpus_info['documents_number']
         key_words = corpus_info['key_words']
         corpus_words = Counter(corpus_info['corpus'])
 
