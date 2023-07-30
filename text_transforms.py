@@ -53,3 +53,22 @@ def get_features(data: str | list[str]) -> np.ndarray:
             corpus_words.subtract(common_words)
         return features
     raise ValueError(f'Incorrect type of data provided: {type(data)}')
+
+
+if __name__ == '__main__':
+    """
+        It's essential to provide text through 'message' key
+        in JSON file!
+        The output file contains 'features' key with list of
+        feature-numbers.
+    """
+    import sys
+    src_file, dst_file = sys.argv[1], sys.argv[2]
+
+    with open(src_file, 'r') as f:
+        text = json.load(f)['message']
+    with open(dst_file, 'w') as f:
+        to_write = {
+            'features': get_features(text).tolist()[0]
+        }
+        json.dump(to_write, f)
