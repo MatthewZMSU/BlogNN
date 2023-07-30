@@ -23,33 +23,33 @@ def _get_words(text: str) -> list[str]:
     return list(stemmed)
 
 
-def get_features(request: dict) -> dict:
+def get_features(data: str | list[str]) -> np.ndarray:
+    """
+    :param data: str | list[str]. Text for encoding with tf-idf
+    :return: np.ndarray. Array with required features
     """
 
-    :param request: dict - dict-container for text from user. It essential to provide
-        text via 'message' key
-    :return: dict - features vector provided via 'features'
-    """
-    if 'message' not in request:
-        raise ValueError('No "message" field in the JSON')
-    text = request.get('message')
-    words = _get_words(text)
-    document_words = Counter(words)
+    if isinstance(data, str):
+        data = [data]
+    if isinstance(data, list):
+        with open('corpus.json', 'r') as f:
+            corpus_info = json.load(f)
+            total_documents = corpus_info['documents_number']
+            key_words = corpus_info['key_words']
+            corpus_words = Counter(corpus_info['corpus'])
 
-    with open('corpus.json', 'r') as f:
-        corpus_info = json.load(f)
-        total_documents = corpus_info['documents_number']
-        key_words = corpus_info['key_words']
-        corpus_words = Counter(corpus_info['corpus'])
+        features = np.zeros(shape=(len(data), len(key_words)), dtype=float)
+        for text_ind, text in enumerate(data):
+            words = _get_words(text)
+            document_words = Counter(words)
+            common_words = set(key_words).intersection(document_words.keys())
+            corpus_words.update(common_words)
 
-    corpus_words.update(set(words).intersection(set(key_words)))
+            for feature_ind, key in key_words:
+                tf = document_words[key] / document_words.total()
+                idf = np.log(total_documents / corpus_words[key])
+                features[text_ind][feature_ind] = tf * idf
 
-    features = np.zeros(shape=(len(key_words), ), dtype=float)
-    for ind, key in enumerate(key_words):
-        tf = document_words[key] / document_words.total()
-        idf = np.log(total_documents / corpus_words[key])
-        features[ind] = tf * idf
-
-    return {
-        'features': features.tolist()
-    }
+            corpus_words.subtract(common_words)
+        return features
+    raise ValueError(f'Incorrect type of data provided: {type(data)}')
