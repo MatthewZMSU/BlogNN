@@ -40,7 +40,7 @@ def get_features(data: str | list[str],
             key_words = corpus_info['key_words']
             corpus_words = Counter(corpus_info['corpus'])
 
-        features = np.zeros(shape=(len(data), len(key_words)), dtype=float)
+        features = np.zeros(shape=(len(data), len(key_words)), dtype='float32')
         for text_ind, text in enumerate(data):
             words = _get_words(text)
             document_words = Counter(words)
