@@ -23,8 +23,10 @@ def _get_words(text: str) -> list[str]:
     return list(stemmed)
 
 
-def get_features(data: str | list[str]) -> np.ndarray:
+def get_features(data: str | list[str],
+                 mode: str) -> np.ndarray:
     """
+    :param mode: parameter for defining behaviour
     :param data: str | list[str]. Text for encoding with tf-idf
     :return: np.ndarray. Array with required features
     """
@@ -42,15 +44,15 @@ def get_features(data: str | list[str]) -> np.ndarray:
         for text_ind, text in enumerate(data):
             words = _get_words(text)
             document_words = Counter(words)
-            common_words = set(key_words).intersection(document_words.keys())
-            corpus_words.update(common_words)
+            if document_words.total():
+                common_words = set(key_words).intersection(document_words.keys()) if mode == 'test' else {}
+                corpus_words.update(common_words)
 
-            for feature_ind, key in key_words:
-                tf = document_words[key] / document_words.total()
-                idf = np.log(total_documents / corpus_words[key])
-                features[text_ind][feature_ind] = tf * idf
-
-            corpus_words.subtract(common_words)
+                for feature_ind, key in enumerate(key_words):
+                    tf = document_words[key] / document_words.total()
+                    idf = np.log(total_documents / corpus_words[key])
+                    features[text_ind][feature_ind] = tf * idf
+                corpus_words.subtract(common_words)
         return features
     raise ValueError(f'Incorrect type of data provided: {type(data)}')
 
@@ -69,6 +71,6 @@ if __name__ == '__main__':
         text = json.load(f)['message']
     with open(dst_file, 'w') as f:
         to_write = {
-            'features': get_features(text).tolist()[0]
+            'features': get_features(text, mode='test').tolist()[0]
         }
         json.dump(to_write, f)
