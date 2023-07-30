@@ -21,12 +21,8 @@ class BlogClassifier(nn.Module):
             # nn.AvgPool1d(kernel_size=3, stride=2),
             # nn.MaxPool1d(kernel_size=2, stride=2),
             # nn.AvgPool1d(kernel_size=3, stride=3),  # (batch_size, 64)
-            nn.Linear(FEATURES_NUM, 256),
-            nn.ReLU(),
-            nn.Linear(256, 64),
-            nn.ReLU(),
-            nn.Linear(64, 16),
-            nn.ReLU(),
+            nn.Linear(FEATURES_NUM, 16),
+            nn.ELU(),
             nn.Linear(16, 4),
             nn.ReLU(),
             nn.Linear(4, 2),
@@ -144,18 +140,22 @@ def main():
     valid_dataset = BlogTextDataset(valid_texts, valid_labels)
     test_dataset = BlogTextDataset(test_texts, test_labels)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-    valid_dataloader = DataLoader(valid_dataset, batch_size=16, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    valid_dataloader = DataLoader(valid_dataset, batch_size=32, shuffle=True)
+    test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
     loss_fn = nn.BCELoss()
-    optimizer = torch.optim.SGD(neural_network.parameters(),
-                                lr=0.1)  # SGD with momentum
+    # optimizer = torch.optim.SGD(neural_network.parameters(),
+    #                             lr=0.01)  # SGD with momentum
+    optimizer = torch.optim.Adam(neural_network.parameters(),
+                                 lr=0.04,
+                                 betas=(0.99, 0.999),
+                                 eps=0.001)
 
     train(neural_network, train_dataloader, device,
           loss_fn, optimizer,
           verbose=True, valid_dataloader=valid_dataloader,
-          n_epochs=1000)
+          n_epochs=3000)
 
 
 if __name__ == '__main__':
