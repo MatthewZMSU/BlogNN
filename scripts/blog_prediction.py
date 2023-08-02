@@ -10,13 +10,13 @@ import numpy as np
 
 if __name__ == "__main__":
     """
-        To run the script you need to provide 2 arguments:
-        name of file with model weights and JSON file with
-        feature vector provided with 'features' key.
+        To run the script you need to provide 1 argument:
+        name of JSON file with feature vector provided with
+        'features' key.
     """
     cur_dir = Path(inspect.stack()[0][1]).parent
-    weights_fp = os.path.join(cur_dir, sys.argv[1])
-    features_fp = os.path.join(cur_dir, sys.argv[2])
+    weights_fp = os.path.join(cur_dir, '../models/' + sys.argv[1])
+    features_fp = os.path.join(cur_dir, '../JSONs/')
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     neural_network = BlogClassifier().to(device)

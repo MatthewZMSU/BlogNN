@@ -75,7 +75,7 @@ if __name__ == '__main__':
     """
     cur_dir = Path(inspect.stack()[0][1]).parent
     src_file = os.path.join(cur_dir, '../JSONs/' + sys.argv[1])
-    dst_file = os.path.join(cur_dir, sys.argv[2])
+    dst_file = os.path.join(cur_dir, '../JSONs/' + sys.argv[2])
     corpus_file = os.path.join(cur_dir, '../JSONs/corpus.json')
 
     with open(src_file, 'r') as f:
