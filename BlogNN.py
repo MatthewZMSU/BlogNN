@@ -55,26 +55,19 @@ def __define_label(author: str) -> int:
         raise ValueError(f"Not correct username from telegram: {author}")
 
 
-def __get_class_probabilities(model_output: torch.Tensor) -> torch.Tensor:
-    output = model_output.clone().cpu().detach().numpy()
-    max_outputs = output[:, 1]
-    return torch.from_numpy(max_outputs)
-
-
-def test(model: nn.Module, test_dataloader: DataLoader,
-         loss_fn, device) -> float:
+def _test(model: nn.Module, test_dataloader: DataLoader,
+          loss_fn, device) -> float:
     model.eval()
     with torch.no_grad():
-        test_loss, correct = 0, 0
+        test_loss, correct = 0.0, 0
         for X, y in test_dataloader:
             X, y = X.to(device), y.to(device)
 
             prediction = model(X)
-            # class_probabilities = prediction[:, 1]
             test_loss += loss_fn(prediction[:, 1], y)
-            correct += (torch.argmax(prediction, dim=1) == y).type(torch.float).sum().item()
+            correct += (torch.argmax(prediction, dim=1) == y).type(torch.int).sum().item()
         print(f"Test loss is {test_loss}")
-        print(f"Correctness on test is {correct}")
+        print(f"Correctness on test is {correct} out of {len(test_dataloader)}")
     return test_loss
 
 
@@ -99,7 +92,7 @@ def _train(model: nn.Module, train_dataloader, device,
             if verbose and batch % 10 == 0:
                 print(f"Loss {loss.item()} on epoch {epoch}")
                 if valid_dataloader:
-                    test(model, valid_dataloader, loss_fn, device)
+                    _test(model, valid_dataloader, loss_fn, device)
                     model.train()
         if fp_to_load is not None:
             torch.save(model.state_dict(), 'weights')
