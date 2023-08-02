@@ -79,7 +79,7 @@ def _test(model: nn.Module, test_dataloader: DataLoader,
             test_loss += loss_fn(prediction[:, 1], y)
             correct += (torch.argmax(prediction, dim=1) == y).type(torch.int).sum().item()
         print(f"Test loss is {test_loss}")
-        print(f"Correctness on test is {correct} out of {len(test_dataloader)}")
+        print(f"Correctness on test is {correct}")
     return test_loss
 
 
@@ -87,13 +87,14 @@ def _train(model: nn.Module, train_dataloader, device,
            loss_fn, optimizer: torch.optim.Optimizer,
            verbose: bool = False, valid_dataloader=None,
            n_epochs: int = 50,
-           fp_to_load: str | None = None):
+           fp_to_save: str = '.', fp_to_load: str | None = None):
     no_profit_epoch_number = 0
     last_loss = 0.0
 
     model.train()
     for epoch in range(1, n_epochs + 1):
-        print(f'Epoch {epoch} {"-" * 80}')
+        if epoch % 10 == 0:
+            print(f'Epoch {epoch} {"-" * 80}')
         for batch, (X, y) in enumerate(train_dataloader, start=1):
             X, y = X.to(device), y.to(device)
 
@@ -104,26 +105,27 @@ def _train(model: nn.Module, train_dataloader, device,
             optimizer.step()
             optimizer.zero_grad()
 
-            if verbose and batch % 10 == 0:
-                print(f"Loss {loss.item()} on epoch {epoch}")
-                if valid_dataloader:
-                    _test(model, valid_dataloader, loss_fn, device)
-                    model.train()
+        if verbose and epoch % 10 == 0:
+            print(f"Loss {loss.item()} on epoch {epoch}")
+            if valid_dataloader:
+                _test(model, valid_dataloader, loss_fn, device)
+                model.train()
 
-            if loss >= last_loss:
-                no_profit_epoch_number += 1
-                if no_profit_epoch_number > 5:
-                    __save_model_weights(model.state_dict(), '.',
-                                         'blog_model', f"{epoch}")
-                    raise StopIteration(f"No profit. Last epoch: {epoch}, last loss: {loss}")
-            else:
-                no_profit_epoch_number = 0
-            last_loss = loss
+        if loss >= last_loss:
+            no_profit_epoch_number += 1
+            if no_profit_epoch_number > 5:
+                __save_model_weights(model.state_dict(), '.',
+                                     'blog_model', f"{epoch}")
+                raise StopIteration(f"No profit. Last epoch: {epoch}, last loss: {loss}")
+        else:
+            no_profit_epoch_number = 0
+        last_loss = loss
 
         if fp_to_load is not None and epoch % 10 == 0:
-            __save_model_weights(model.state_dict(), '.',
+            __save_model_weights(model.state_dict(), fp_to_save,
                                  'blog_model', f"{epoch}")
-
+    __save_model_weights(model.state_dict(), fp_to_save,
+                         'last+blog_model')
 
 def main():
     random.seed(42)
@@ -171,7 +173,7 @@ def main():
                                  eps=0.001)
 
     _train(neural_network, train_dataloader, device, loss_fn, optimizer, verbose=True,
-           valid_dataloader=valid_dataloader, n_epochs=3000)
+           valid_dataloader=valid_dataloader, n_epochs=3000, fp_to_save='.')
 
     test_loss = _test(neural_network, test_dataloader, loss_fn, device)
     print(f"Loss on train dataset: {test_loss}")
