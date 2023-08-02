@@ -55,6 +55,14 @@ def __define_label(author: str) -> int:
         raise ValueError(f"Not correct username from telegram: {author}")
 
 
+def __save_model_weights(model_weights,
+                         fp_to_save: str, name: str,
+                         additional_formatting: str = ''):
+    additional_formatting = '_' + additional_formatting if additional_formatting else ''
+    fp = f"{fp_to_save}/{name}{additional_formatting}"
+    torch.save(model_weights, f=fp)
+
+
 def _test(model: nn.Module, test_dataloader: DataLoader,
           loss_fn, device) -> float:
     model.eval()
@@ -76,6 +84,9 @@ def _train(model: nn.Module, train_dataloader, device,
            verbose: bool = False, valid_dataloader=None,
            n_epochs: int = 50,
            fp_to_load: str | None = None):
+    no_profit_epoch_number = 0
+    last_loss = 0.0
+
     model.train()
     for epoch in range(1, n_epochs + 1):
         print(f'Epoch {epoch} {"-" * 80}')
@@ -94,8 +105,18 @@ def _train(model: nn.Module, train_dataloader, device,
                 if valid_dataloader:
                     _test(model, valid_dataloader, loss_fn, device)
                     model.train()
-        if fp_to_load is not None:
-            torch.save(model.state_dict(), 'weights')
+
+            if loss >= last_loss:
+                no_profit_epoch_number += 1
+                if no_profit_epoch_number > 5:
+                    raise StopIteration(f"No profit. Last epoch: {epoch}, last loss: {loss}")
+            else:
+                no_profit_epoch_number = 0
+            last_loss = loss
+
+        if fp_to_load is not None and epoch % 10 == 0:
+            __save_model_weights(model.state_dict(), '.',
+                                 'blog_model', f"{epoch}")
 
 
 def main():
