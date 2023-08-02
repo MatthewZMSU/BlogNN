@@ -66,6 +66,7 @@ def __save_model_weights(model_weights,
 def __load_model_weights(model, fp_to_load):
     model.load_state_dict(torch.load(fp_to_load))
 
+
 def _test(model: nn.Module, test_dataloader: DataLoader,
           loss_fn, device) -> float:
     model.eval()
@@ -170,8 +171,10 @@ def main():
                                  eps=0.001)
 
     _train(neural_network, train_dataloader, device, loss_fn, optimizer, verbose=True,
-           valid_dataloader=valid_dataloader, n_epochs=3000,
-           )
+           valid_dataloader=valid_dataloader, n_epochs=3000)
+
+    test_loss = _test(neural_network, test_dataloader, loss_fn, device)
+    print(f"Loss on train dataset: {test_loss}")
 
 
 if __name__ == '__main__':
