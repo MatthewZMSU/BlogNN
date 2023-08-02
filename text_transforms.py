@@ -1,6 +1,10 @@
 from nltk.stem.snowball import RussianStemmer
 from collections import Counter
+from pathlib import Path
 
+import os
+import sys
+import inspect
 import json
 import re
 import numpy as np
@@ -63,9 +67,13 @@ if __name__ == '__main__':
         in JSON file!
         The output file contains 'features' key with list of
         feature-numbers.
+        
+        Before running the script you need to provide 2 CL arguments:
+        source file and destination file names with the corresponding order.
     """
-    import sys
-    src_file, dst_file = sys.argv[1], sys.argv[2]
+    cur_dir = Path(inspect.stack()[0][1]).parent
+    src_file = os.path.join(cur_dir, sys.argv[1])
+    dst_file = os.path.join(cur_dir, sys.argv[2])
 
     with open(src_file, 'r') as f:
         text = json.load(f)['message']
