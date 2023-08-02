@@ -68,7 +68,10 @@ def __load_model_weights(model, fp_to_load):
 
 
 def _test(model: nn.Module, test_dataloader: DataLoader,
-          loss_fn, device) -> float:
+          loss_fn, device,
+          fp_to_load: str | None = None) -> float:
+    if fp_to_load is not None:
+        __load_model_weights(model, fp_to_load)
     model.eval()
     with torch.no_grad():
         test_loss, correct = 0.0, 0
@@ -127,6 +130,7 @@ def _train(model: nn.Module, train_dataloader, device,
     __save_model_weights(model.state_dict(), fp_to_save,
                          'last+blog_model')
 
+
 def main():
     random.seed(42)
     np.random.seed(42)
@@ -172,10 +176,11 @@ def main():
                                  betas=(0.99, 0.999),
                                  eps=0.001)
 
-    _train(neural_network, train_dataloader, device, loss_fn, optimizer, verbose=True,
-           valid_dataloader=valid_dataloader, n_epochs=3000, fp_to_save='.')
+    # _train(neural_network, train_dataloader, device, loss_fn, optimizer, verbose=True,
+    #        valid_dataloader=valid_dataloader, n_epochs=3000, fp_to_save='.')
 
-    test_loss = _test(neural_network, test_dataloader, loss_fn, device)
+    test_loss = _test(neural_network, test_dataloader, loss_fn, device,
+                      fp_to_load='./blog_model_1380')
     print(f"Loss on train dataset: {test_loss}")
 
 
