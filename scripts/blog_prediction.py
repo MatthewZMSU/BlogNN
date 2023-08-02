@@ -15,8 +15,8 @@ if __name__ == "__main__":
         'features' key.
     """
     cur_dir = Path(inspect.stack()[0][1]).parent
-    weights_fp = os.path.join(cur_dir, '../models/' + sys.argv[1])
-    features_fp = os.path.join(cur_dir, '../JSONs/')
+    weights_fp = os.path.join(cur_dir, '../models/blog_model')
+    features_fp = os.path.join(cur_dir, '../JSONs/' + sys.argv[1])
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     neural_network = BlogClassifier().to(device)
