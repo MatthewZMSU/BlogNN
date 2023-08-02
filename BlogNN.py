@@ -181,7 +181,7 @@ def main():
 
     test_loss = _test(neural_network, test_dataloader, loss_fn, device,
                       fp_to_load='./blog_model_1380')
-    print(f"Loss on train dataset: {test_loss}")
+    print(f"Loss on test dataset: {test_loss}")
 
 
 if __name__ == '__main__':
