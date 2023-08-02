@@ -74,9 +74,9 @@ if __name__ == '__main__':
         source file and destination file names with the corresponding order.
     """
     cur_dir = Path(inspect.stack()[0][1]).parent
-    src_file = os.path.join(cur_dir, sys.argv[1])
+    src_file = os.path.join(cur_dir, '../JSONs/' + sys.argv[1])
     dst_file = os.path.join(cur_dir, sys.argv[2])
-    corpus_file = os.path.join(cur_dir, 'corpus.json')
+    corpus_file = os.path.join(cur_dir, '../JSONs/corpus.json')
 
     with open(src_file, 'r') as f:
         text = json.load(f)['message']

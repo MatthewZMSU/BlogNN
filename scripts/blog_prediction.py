@@ -10,7 +10,7 @@ import numpy as np
 
 if __name__ == "__main__":
     """
-        When run the script you need to provide 2 arguments:
+        To run the script you need to provide 2 arguments:
         name of file with model weights and JSON file with
         feature vector provided with 'features' key.
     """
