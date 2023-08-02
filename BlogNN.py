@@ -63,6 +63,9 @@ def __save_model_weights(model_weights,
     torch.save(model_weights, f=fp)
 
 
+def __load_model_weights(model, fp_to_load):
+    model.load_state_dict(torch.load(fp_to_load))
+
 def _test(model: nn.Module, test_dataloader: DataLoader,
           loss_fn, device) -> float:
     model.eval()
@@ -109,6 +112,8 @@ def _train(model: nn.Module, train_dataloader, device,
             if loss >= last_loss:
                 no_profit_epoch_number += 1
                 if no_profit_epoch_number > 5:
+                    __save_model_weights(model.state_dict(), '.',
+                                         'blog_model', f"{epoch}")
                     raise StopIteration(f"No profit. Last epoch: {epoch}, last loss: {loss}")
             else:
                 no_profit_epoch_number = 0
