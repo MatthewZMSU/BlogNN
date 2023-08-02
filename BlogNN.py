@@ -7,7 +7,6 @@ from torch import nn
 from torch.utils.data import Dataset, DataLoader
 from text_transforms import get_features
 
-
 FEATURES_NUM = 770
 SAMPLES_NUM = 459
 TRAIN_SAMPLES = 380
@@ -18,9 +17,6 @@ class BlogClassifier(nn.Module):
     def __init__(self):
         super().__init__()
         self.base_blog_classifier = nn.Sequential(
-            # nn.AvgPool1d(kernel_size=3, stride=2),
-            # nn.MaxPool1d(kernel_size=2, stride=2),
-            # nn.AvgPool1d(kernel_size=3, stride=3),  # (batch_size, 64)
             nn.Linear(FEATURES_NUM, 16),
             nn.ELU(),
             nn.Linear(16, 4),
@@ -65,7 +61,8 @@ def __get_class_probabilities(model_output: torch.Tensor) -> torch.Tensor:
     return torch.from_numpy(max_outputs)
 
 
-def test(model: nn.Module, test_dataloader, loss_fn, device):
+def test(model: nn.Module, test_dataloader: DataLoader,
+         loss_fn, device) -> float:
     model.eval()
     with torch.no_grad():
         test_loss, correct = 0, 0
@@ -78,12 +75,14 @@ def test(model: nn.Module, test_dataloader, loss_fn, device):
             correct += (torch.argmax(prediction, dim=1) == y).type(torch.float).sum().item()
         print(f"Test loss is {test_loss}")
         print(f"Correctness on test is {correct}")
+    return test_loss
 
 
-def train(model: nn.Module, train_dataloader, device,
-          loss_fn, optimizer: torch.optim.Optimizer,
-          verbose: bool = False, valid_dataloader=None,
-          n_epochs: int = 50):
+def _train(model: nn.Module, train_dataloader, device,
+           loss_fn, optimizer: torch.optim.Optimizer,
+           verbose: bool = False, valid_dataloader=None,
+           n_epochs: int = 50,
+           fp_to_load: str | None = None):
     model.train()
     for epoch in range(1, n_epochs + 1):
         print(f'Epoch {epoch} {"-" * 80}')
@@ -91,7 +90,6 @@ def train(model: nn.Module, train_dataloader, device,
             X, y = X.to(device), y.to(device)
 
             prediction = model(X)
-            # class_probabilities = __get_class_probabilities(prediction).to(device)
             loss = loss_fn(prediction[:, 1], y)
 
             loss.backward()
@@ -103,6 +101,8 @@ def train(model: nn.Module, train_dataloader, device,
                 if valid_dataloader:
                     test(model, valid_dataloader, loss_fn, device)
                     model.train()
+        if fp_to_load is not None:
+            torch.save(model.state_dict(), 'weights')
 
 
 def main():
@@ -145,17 +145,14 @@ def main():
     test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
     loss_fn = nn.BCELoss()
-    # optimizer = torch.optim.SGD(neural_network.parameters(),
-    #                             lr=0.01)  # SGD with momentum
     optimizer = torch.optim.Adam(neural_network.parameters(),
                                  lr=0.04,
                                  betas=(0.99, 0.999),
                                  eps=0.001)
 
-    train(neural_network, train_dataloader, device,
-          loss_fn, optimizer,
-          verbose=True, valid_dataloader=valid_dataloader,
-          n_epochs=3000)
+    _train(neural_network, train_dataloader, device, loss_fn, optimizer, verbose=True,
+           valid_dataloader=valid_dataloader, n_epochs=3000,
+           )
 
 
 if __name__ == '__main__':
