@@ -142,7 +142,7 @@ def main():
     print(f"Model structure:")
     print(neural_network)
 
-    with open('../texts.json', 'r') as f:
+    with open('../JSONs/texts.json', 'r') as f:
         data = json.load(f)
     data = list(filter(lambda post: post['author'] and post['message'], data))
 
@@ -176,11 +176,11 @@ def main():
                                  betas=(0.99, 0.999),
                                  eps=0.001)
 
-    # _train(neural_network, train_dataloader, device, loss_fn, optimizer, verbose=True,
-    #        valid_dataloader=valid_dataloader, n_epochs=3000, fp_to_save='.')
+    _train(neural_network, train_dataloader, device, loss_fn, optimizer, verbose=True,
+           valid_dataloader=valid_dataloader, n_epochs=3000, fp_to_save='.')
 
     test_loss = _test(neural_network, test_dataloader, loss_fn, device,
-                      fp_to_load='./blog_model_1380')
+                      fp_to_load='./blog_model')
     print(f"Loss on test dataset: {test_loss}")
 
 
