@@ -28,8 +28,10 @@ def _get_words(text: str) -> list[str]:
 
 
 def get_features(data: str | list[str],
-                 mode: str) -> np.ndarray:
+                 mode: str,
+                 fp: str) -> np.ndarray:
     """
+    :param fp: defines where corpus is located
     :param mode: parameter for defining behaviour
     :param data: str | list[str]. Text for encoding with tf-idf
     :return: np.ndarray. Array with required features
@@ -38,7 +40,7 @@ def get_features(data: str | list[str],
     if isinstance(data, str):
         data = [data]
     if isinstance(data, list):
-        with open('corpus.json', 'r') as f:
+        with open(fp, 'r') as f:
             corpus_info = json.load(f)
             total_documents = corpus_info['documents_number']
             key_words = corpus_info['key_words']
@@ -74,11 +76,12 @@ if __name__ == '__main__':
     cur_dir = Path(inspect.stack()[0][1]).parent
     src_file = os.path.join(cur_dir, sys.argv[1])
     dst_file = os.path.join(cur_dir, sys.argv[2])
+    corpus_file = os.path.join(cur_dir, 'corpus.json')
 
     with open(src_file, 'r') as f:
         text = json.load(f)['message']
     with open(dst_file, 'w') as f:
         to_write = {
-            'features': get_features(text, mode='test').tolist()[0]
+            'features': get_features(text, mode='test', fp=corpus_file).tolist()[0]
         }
         json.dump(to_write, f)

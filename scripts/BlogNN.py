@@ -5,7 +5,7 @@ import torch
 
 from torch import nn
 from torch.utils.data import Dataset, DataLoader
-from text_transforms import get_features
+from scripts.text_transforms import get_features
 
 FEATURES_NUM = 770
 SAMPLES_NUM = 459
@@ -142,7 +142,7 @@ def main():
     print(f"Model structure:")
     print(neural_network)
 
-    with open('texts.json', 'r') as f:
+    with open('../texts.json', 'r') as f:
         data = json.load(f)
     data = list(filter(lambda post: post['author'] and post['message'], data))
 
