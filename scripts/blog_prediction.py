@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     neural_network = BlogClassifier().to(device)
-    neural_network.load_state_dict(torch.load(weights_fp))
+    neural_network.load_state_dict(torch.load(weights_fp, map_location=torch.device('cpu')))
     neural_network.eval()  # Not necessary in our case but best practice
 
     with open(features_fp, 'r') as f:
