@@ -11,6 +11,8 @@ import org.apache.http.impl.client.HttpClients;
 import ru.BotTogether.dto.MessageDTO;
 
 import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import static ru.BotTogether.TextGetter.getPathFromArgs;
 import static ru.BotTogether.TextGetter.getTextFromFileByPath;
@@ -26,9 +28,7 @@ public class Client {
     private void execute(String[] args) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String textFromFile = objectMapper.writeValueAsString(
-                    getTextFromFileByPath(
-                            getPathFromArgs(args)
-                    )
+                    getTextFromFileByPath(getPathFromArgs(args))
             );
 
             HttpPost httpPost = new HttpPost(END_POINT);
@@ -72,7 +72,8 @@ public class Client {
 
 
     private void handlePostRequest(HttpPost httpPost, String textFromFile) throws UnsupportedEncodingException {
-        StringEntity params = new StringEntity(textFromFile);
+        StringEntity params = new StringEntity(URLEncoder.encode(textFromFile, StandardCharsets.UTF_8));
+
         httpPost.addHeader("content-type", "application/json");
         httpPost.addHeader("requestLength", String.valueOf(textFromFile.length()));
 

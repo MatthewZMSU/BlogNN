@@ -11,6 +11,8 @@ import ru.BotTogether.helper.TextHandler;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class Server {
@@ -78,9 +80,8 @@ public class Server {
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(requestBody))) {
 
             String allTextFromBufferReader = TextGetter.getAllTextFromBufferReader(bufferedReader);
-            textFromClient = objectMapper.readValue(allTextFromBufferReader, String.class);
+            textFromClient = URLDecoder.decode(allTextFromBufferReader, StandardCharsets.UTF_8);
         }
-        ;
         return textFromClient;
     }
 
