@@ -6,6 +6,11 @@ import lombok.Getter;
 import ru.BotTogether.helper.dto.MessageDTO;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import static ru.BotTogether.helper.PyScriptExecutor.executePyScript;
@@ -31,7 +36,17 @@ public class TextHandler {
         this.fileOutput = fileOutput;
     }
 
-    private String makeFileFromJson(String name, String json) {
+    private String makeFileFromJson(String name, String json) throws IOException {
+        String path = Objects.requireNonNull(TextHandler.class.getResource(PATH_TO_JSONS)).getPath();
+
+        Path pathToFile = Paths.get(path, name);
+
+        Files.deleteIfExists(pathToFile);
+        File file = Files.createFile(pathToFile).toFile();
+        file.setWritable(true);
+        try (FileOutputStream f = new FileOutputStream(file)) {
+            f.write(json.getBytes());
+        }
         return null;
     }
 
@@ -47,14 +62,19 @@ public class TextHandler {
         }
     }
 
-    public void executePyCode(String text) {
+    public String executePyCode(String text) {
         //ignored s for now
-        String s = makeFileFromJson(fileOutput, makeJsonFromText(text));
+        try {
+            String s = makeFileFromJson(fileInput, makeJsonFromText(text));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         String pathToScript = Objects.requireNonNull(TextHandler.class.getResource(PATH_TO_SCRIPTS + SCRIPT_NAME)).getPath();
         executePyScript(pathToScript, new String[]{fileInput, fileOutput});
 
         checkOutputFileIsDone();
+        return fileOutput;
     }
 
     private void checkOutputFileIsDone() {

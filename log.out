@@ -4,3 +4,8 @@ SERVER: parsed POST-request
 SERVER: get answer from TextHandler
 SERVER: get answer from ModelHandler
 SERVER: send response
+SERVER: get POST-request
+SERVER: parsed POST-request
+SERVER: get answer from TextHandler
+SERVER: get answer from ModelHandler
+SERVER: send response

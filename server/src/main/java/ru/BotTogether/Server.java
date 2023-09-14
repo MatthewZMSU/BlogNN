@@ -14,7 +14,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public class Server {
-    private static final Logger log = Logger.getLogger(Server.class);
+    public static final Logger log = Logger.getLogger(Server.class);
     private static final int PORT = 4242;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -56,9 +56,8 @@ public class Server {
 
         //Пошел к мс 1
         TextHandler textHandler = new TextHandler();
-        textHandler.executePyCode(textFromPostRequest);
+        String outputFile = textHandler.executePyCode(textFromPostRequest);
 
-        String outputFile = textHandler.getFileOutput();
         log.info("SERVER: get answer from TextHandler");
 
 
