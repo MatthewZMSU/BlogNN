@@ -69,7 +69,6 @@ public class Server {
         log.info("SERVER: get answer from ModelHandler");
 
 
-//        String resp = "FuckYou";
         sendResponse(exchange, resp);
         log.info("SERVER: send response");
     }
@@ -79,8 +78,11 @@ public class Server {
         try (InputStream requestBody = exchange.getRequestBody();
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(requestBody))) {
 
+            log.info("parsing request body");
             String allTextFromBufferReader = TextGetter.getAllTextFromBufferReader(bufferedReader);
+            log.info("get the whole text: " + allTextFromBufferReader);
             textFromClient = URLDecoder.decode(allTextFromBufferReader, StandardCharsets.UTF_8);
+            log.info("decode text: " + textFromClient);
         }
         return textFromClient;
     }

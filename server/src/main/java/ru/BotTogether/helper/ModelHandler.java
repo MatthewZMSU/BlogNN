@@ -38,13 +38,7 @@ public class ModelHandler {
         String pathToScript = Objects.requireNonNull(ModelHandler.class.getResource(PATH_TO_FILES + SCRIPT_NAME)).getPath();
         Process p = executePyScript(pathToScript, new String[]{fileInput});
 
-        String allTextFromBufferReader;
-        try (BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-            allTextFromBufferReader = getAllTextFromBufferReader(stdInput);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        ;
+        String allTextFromBufferReader = PyScriptExecutor.getProcessOutput(p);
 
         return makeJsonFromText(allTextFromBufferReader);
     }

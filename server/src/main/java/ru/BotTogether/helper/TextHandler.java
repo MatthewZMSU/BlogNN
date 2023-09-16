@@ -3,6 +3,8 @@ package ru.BotTogether.helper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import org.apache.log4j.Logger;
+import ru.BotTogether.Server;
 import ru.BotTogether.helper.dto.MessageDTO;
 
 import java.io.File;
@@ -17,6 +19,8 @@ import static ru.BotTogether.helper.PyScriptExecutor.executePyScript;
 
 
 public class TextHandler {
+
+    private static final Logger log = Server.log;
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private static final String PATH_TO_SCRIPTS = "/BlogNN/scripts/";
     private static final String PATH_TO_JSONS = "/BlogNN/JSONs/";
@@ -71,7 +75,8 @@ public class TextHandler {
         }
 
         String pathToScript = Objects.requireNonNull(TextHandler.class.getResource(PATH_TO_SCRIPTS + SCRIPT_NAME)).getPath();
-        executePyScript(pathToScript, new String[]{fileInput, fileOutput});
+        Process p = executePyScript(pathToScript, new String[]{fileInput, fileOutput});
+        log.info("process info: " + PyScriptExecutor.getProcessOutput(p));
 
         checkOutputFileIsDone();
         return fileOutput;
