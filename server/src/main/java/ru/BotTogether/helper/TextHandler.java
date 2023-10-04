@@ -79,6 +79,7 @@ public class TextHandler {
         log.info("process info: " + PyScriptExecutor.getProcessOutput(p));
 
         checkOutputFileIsDone();
+        log.info("SERVER: get answer from TextHandler");
         return fileOutput;
     }
 

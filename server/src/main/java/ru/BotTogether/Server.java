@@ -52,23 +52,16 @@ public class Server {
         Long length = Long.parseLong(requestLength.get(0));
 
         String textFromPostRequest = getTextFromPostRequest(exchange);
-        log.info("SERVER: parsed POST-request");
 
         //Пошел к мс 1
         TextHandler textHandler = new TextHandler();
         String outputFile = textHandler.executePyCode(textFromPostRequest);
 
-        log.info("SERVER: get answer from TextHandler");
-
-
         //Пошел к мс 2
         ModelHandler modelHandler = new ModelHandler(outputFile);
         String resp = modelHandler.executePyCode();
-        log.info("SERVER: get answer from ModelHandler");
-
 
         sendResponse(exchange, 200, resp);
-        log.info("SERVER: send response");
     }
 
     private String getTextFromPostRequest(HttpExchange exchange) throws IOException {
@@ -77,6 +70,7 @@ public class Server {
             String allTextFromBufferReader = TextGetter.getAllTextFromInputStream(requestBody);
             textFromClient = URLDecoder.decode(allTextFromBufferReader, StandardCharsets.UTF_8);
         }
+        log.info("SERVER: parsed POST-request");
         return textFromClient;
     }
 
@@ -88,5 +82,6 @@ public class Server {
             bufferedWriter.write(resp);
             bufferedWriter.flush();
         }
+        log.info("SERVER: send response");
     }
 }

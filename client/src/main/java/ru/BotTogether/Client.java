@@ -36,34 +36,11 @@ public class Client {
             handlePostRequest(httpPost, textFromFile);
 
             try (CloseableHttpResponse response = httpClient.execute(httpPost);) {
-
-                long start = System.currentTimeMillis();
-                while (true) {
-                    try {
-                        assert response.getStatusLine().getStatusCode() == 200;
-
-                        String responseBody = getResponseBody(response);
-
-                        MessageDTO dto = objectMapper.readValue(responseBody, MessageDTO.class);
-                        System.out.println("Ответ модели: " + dto.getMessage());
-                        break;
-                    } catch (AssertionError e) {
-                        if (System.currentTimeMillis() - start >= 10_000) {
-                            throw new RuntimeException("Время ожидания > 10 секунд." + e);
-                        }
-
-                        try {
-                            Thread.sleep(1_000);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-                System.out.println("Server error -- 5?? code");
+                getResponse(response);
+            } catch (Exception e) {
+                System.out.println("Закрываемся!");
+                System.out.println(e.getMessage());
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -78,6 +55,32 @@ public class Client {
         httpPost.addHeader("requestLength", String.valueOf(textFromFile.length()));
 
         httpPost.setEntity(params);
+    }
+
+    private void getResponse(CloseableHttpResponse response) {
+        long start = System.currentTimeMillis();
+        while (true) {
+            try {
+                if (System.currentTimeMillis() - start >= 10_000) {
+                    throw new RuntimeException("Время ожидания > 10 секунд.");
+                }
+                String responseBody = getResponseBody(response);
+
+                if (response.getStatusLine().getStatusCode() / 100 == 2) {
+                    MessageDTO dto = objectMapper.readValue(responseBody, MessageDTO.class);
+                    System.out.println("Ответ модели: " + dto.getMessage());
+                } else {
+                    System.out.println(objectMapper.readValue(responseBody, String.class));
+                }
+                break;
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(1_000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
     }
 
     private String getResponseBody(CloseableHttpResponse response) throws IOException {

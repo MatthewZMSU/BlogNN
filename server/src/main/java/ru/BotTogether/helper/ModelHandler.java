@@ -2,6 +2,7 @@ package ru.BotTogether.helper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.BotTogether.Server;
 import ru.BotTogether.helper.dto.MessageDTO;
 
 import java.util.Objects;
@@ -36,6 +37,7 @@ public class ModelHandler {
 
         String allTextFromBufferReader = PyScriptExecutor.getProcessOutput(p);
 
+        Server.log.info("SERVER: get answer from ModelHandler");
         return makeJsonFromText(allTextFromBufferReader);
     }
 }
