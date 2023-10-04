@@ -10,7 +10,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import ru.BotTogether.dto.MessageDTO;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -46,8 +47,7 @@ public class Client {
                         MessageDTO dto = objectMapper.readValue(responseBody, MessageDTO.class);
                         System.out.println("Ответ модели: " + dto.getMessage());
                         break;
-                    }
-                    catch (AssertionError e) {
+                    } catch (AssertionError e) {
                         if (System.currentTimeMillis() - start >= 10_000) {
                             throw new RuntimeException("Время ожидания > 10 секунд." + e);
                         }
@@ -60,8 +60,7 @@ public class Client {
                     }
                 }
 
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println("Server error -- 5?? code");
             }
 
@@ -72,7 +71,8 @@ public class Client {
 
 
     private void handlePostRequest(HttpPost httpPost, String textFromFile) throws UnsupportedEncodingException {
-        StringEntity params = new StringEntity(URLEncoder.encode(textFromFile, StandardCharsets.UTF_8));
+        String encode = URLEncoder.encode(textFromFile, StandardCharsets.UTF_8);
+        StringEntity params = new StringEntity(encode);
 
         httpPost.addHeader("content-type", "application/json");
         httpPost.addHeader("requestLength", String.valueOf(textFromFile.length()));
@@ -81,15 +81,7 @@ public class Client {
     }
 
     private String getResponseBody(CloseableHttpResponse response) throws IOException {
-        StringBuilder resp = new StringBuilder();
-
         HttpEntity entity = response.getEntity();
-        try (InputStream inputStream = entity.getContent();
-            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream));) {
-            do {
-                resp.append((char) bf.read());
-            } while (bf.ready());
-        }
-        return resp.toString();
+        return new String(entity.getContent().readAllBytes());
     }
 }

@@ -3,17 +3,16 @@ package ru.BotTogether.helper;
 import org.apache.log4j.Logger;
 import ru.BotTogether.Server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static ru.BotTogether.helper.TextGetter.getAllTextFromBufferReader;
+import static ru.BotTogether.helper.TextGetter.getAllTextFromInputStream;
 
 public class PyScriptExecutor {
 
     private static final Logger log = Server.log;
+
     public static Process executePyScript(String pathToScript, String[] params) {
 
         StringBuilder sb = new StringBuilder();
@@ -41,8 +40,8 @@ public class PyScriptExecutor {
 
     public static String getProcessOutput(Process p) {
         String allTextFromBufferReader;
-        try (BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-            allTextFromBufferReader = getAllTextFromBufferReader(stdInput);
+        try {
+            allTextFromBufferReader = getAllTextFromInputStream(p.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

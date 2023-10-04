@@ -1,6 +1,5 @@
 package ru.BotTogether;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -18,7 +17,6 @@ import java.util.List;
 public class Server {
     public static final Logger log = Logger.getLogger(Server.class);
     private static final int PORT = 4242;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public static void main(String[] args) {
         new Server().execute();
@@ -69,26 +67,21 @@ public class Server {
         log.info("SERVER: get answer from ModelHandler");
 
 
-        sendResponse(exchange, resp);
+        sendResponse(exchange, 200, resp);
         log.info("SERVER: send response");
     }
 
     private String getTextFromPostRequest(HttpExchange exchange) throws IOException {
         String textFromClient;
-        try (InputStream requestBody = exchange.getRequestBody();
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(requestBody))) {
-
-            log.info("parsing request body");
-            String allTextFromBufferReader = TextGetter.getAllTextFromBufferReader(bufferedReader);
-            log.info("get the whole text: " + allTextFromBufferReader);
+        try (InputStream requestBody = exchange.getRequestBody();) {
+            String allTextFromBufferReader = TextGetter.getAllTextFromInputStream(requestBody);
             textFromClient = URLDecoder.decode(allTextFromBufferReader, StandardCharsets.UTF_8);
-            log.info("decode text: " + textFromClient);
         }
         return textFromClient;
     }
 
-    private void sendResponse(HttpExchange exchange, String resp) throws IOException {
-        exchange.sendResponseHeaders(200, resp.length());
+    private void sendResponse(HttpExchange exchange, Integer code, String resp) throws IOException {
+        exchange.sendResponseHeaders(code, resp.length());
         try (OutputStream outputStream = exchange.getResponseBody();
              BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));) {
 

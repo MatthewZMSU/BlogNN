@@ -4,13 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.BotTogether.helper.dto.MessageDTO;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Objects;
 
 import static ru.BotTogether.helper.PyScriptExecutor.executePyScript;
-import static ru.BotTogether.helper.TextGetter.getAllTextFromBufferReader;
 
 public class ModelHandler {
     private final static ObjectMapper objectMapper = new ObjectMapper();
