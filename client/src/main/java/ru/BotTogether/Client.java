@@ -8,6 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import ru.BotTogether.dto.ErrorDTO;
 import ru.BotTogether.dto.MessageDTO;
 
 import java.io.IOException;
@@ -69,8 +70,8 @@ public class Client {
                 if (response.getStatusLine().getStatusCode() / 100 == 2) {
                     MessageDTO dto = objectMapper.readValue(responseBody, MessageDTO.class);
                     System.out.println("Ответ модели: " + dto.getMessage());
-                } else {
-                    System.out.println(objectMapper.readValue(responseBody, String.class));
+                } else if (response.getStatusLine().getStatusCode() / 100 == 5) {
+                    System.out.println(objectMapper.readValue(responseBody, ErrorDTO.class));
                 }
                 break;
             } catch (Exception e) {

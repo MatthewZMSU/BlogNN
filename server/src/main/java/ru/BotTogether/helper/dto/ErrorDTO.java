@@ -3,14 +3,16 @@ package ru.BotTogether.helper.dto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-public class MessageDTO extends BaseDTO{
+public class ErrorDTO extends BaseDTO{
     private String message;
 
     public static String makeJson(String text) {
-        MessageDTO dict = MessageDTO.builder()
+        ErrorDTO dict = ErrorDTO.builder()
                 .message(text)
                 .build();
 

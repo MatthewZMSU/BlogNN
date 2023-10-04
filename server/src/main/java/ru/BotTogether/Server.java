@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import ru.BotTogether.helper.ModelHandler;
 import ru.BotTogether.helper.TextGetter;
 import ru.BotTogether.helper.TextHandler;
+import ru.BotTogether.helper.dto.ErrorDTO;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -30,7 +31,19 @@ public class Server {
             throw new RuntimeException(e);
         }
         server.createContext("/api/textClassificator", (exchange -> {
-            handleServerLogic(exchange);
+            try {
+                handleServerLogic(exchange);
+            }
+            catch (Throwable e) {
+                log.info("Exception: " + e.getMessage());
+                try {
+                    String resp = ErrorDTO.makeJson("Сервис недоступен :), попробуйте позже.");
+                    sendResponse(exchange, 500, resp);
+                }
+                catch (Throwable ex) {
+                    log.info(ex.getMessage());
+                }
+            }
             exchange.close();
         }));
 

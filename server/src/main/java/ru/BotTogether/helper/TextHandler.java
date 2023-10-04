@@ -1,6 +1,5 @@
 package ru.BotTogether.helper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.apache.log4j.Logger;
@@ -21,7 +20,6 @@ import static ru.BotTogether.helper.PyScriptExecutor.executePyScript;
 public class TextHandler {
 
     private static final Logger log = Server.log;
-    private final static ObjectMapper objectMapper = new ObjectMapper();
     private static final String PATH_TO_SCRIPTS = "/BlogNN/scripts/";
     private static final String PATH_TO_JSONS = "/BlogNN/JSONs/";
 
@@ -54,22 +52,11 @@ public class TextHandler {
         return null;
     }
 
-    private String makeJsonFromText(String text) {
-        MessageDTO dict = MessageDTO.builder()
-                .message(text)
-                .build();
-
-        try {
-            return objectMapper.writeValueAsString(dict);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException();
-        }
-    }
 
     public String executePyCode(String text) {
         //ignored s for now
         try {
-            String s = makeFileFromJson(fileInput, makeJsonFromText(text));
+            String s = makeFileFromJson(fileInput, MessageDTO.makeJson(text));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
