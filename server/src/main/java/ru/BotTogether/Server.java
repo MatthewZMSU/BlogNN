@@ -41,7 +41,7 @@ public class Server {
             catch (Throwable e) {
                 log.info("Exception: " + e.getMessage());
                 try {
-                    String resp = ErrorDTO.makeJson("Сервис недоступен :), попробуйте позже.");
+                    String resp = ErrorDTO.makeJson("Service is not available :), try again later.");
                     sendResponse(exchange, 500, resp);
                 }
                 catch (Throwable ex) {
