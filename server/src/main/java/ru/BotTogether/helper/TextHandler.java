@@ -1,18 +1,24 @@
 package ru.BotTogether.helper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import org.apache.log4j.Logger;
+import ru.BotTogether.Server;
 import ru.BotTogether.helper.dto.MessageDTO;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import static ru.BotTogether.helper.PyScriptExecutor.executePyScript;
 
 
 public class TextHandler {
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final Logger log = Server.log;
     private static final String PATH_TO_SCRIPTS = "/BlogNN/scripts/";
     private static final String PATH_TO_JSONS = "/BlogNN/JSONs/";
 
@@ -31,30 +37,35 @@ public class TextHandler {
         this.fileOutput = fileOutput;
     }
 
-    private String makeFileFromJson(String name, String json) {
+    private String makeFileFromJson(String name, String json) throws IOException {
+        String path = Objects.requireNonNull(TextHandler.class.getResource(PATH_TO_JSONS)).getPath();
+
+        Path pathToFile = Paths.get(path, name);
+
+        Files.deleteIfExists(pathToFile);
+        File file = Files.createFile(pathToFile).toFile();
+        file.setWritable(true);
+        try (FileOutputStream f = new FileOutputStream(file)) {
+            f.write(json.getBytes());
+        }
         return null;
     }
 
-    private String makeJsonFromText(String text) {
-        MessageDTO dict = MessageDTO.builder()
-                .message(text)
-                .build();
 
+    public String executePyCode(String text) {
         try {
-            return objectMapper.writeValueAsString(dict);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException();
+            makeFileFromJson(fileInput, MessageDTO.makeJson(text));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    public void executePyCode(String text) {
-        //ignored s for now
-        String s = makeFileFromJson(fileOutput, makeJsonFromText(text));
 
         String pathToScript = Objects.requireNonNull(TextHandler.class.getResource(PATH_TO_SCRIPTS + SCRIPT_NAME)).getPath();
-        executePyScript(pathToScript, new String[]{fileInput, fileOutput});
+        Process p = executePyScript(pathToScript, new String[]{fileInput, fileOutput});
+        log.info("process info: " + PyScriptExecutor.getProcessOutput(p));
 
         checkOutputFileIsDone();
+        log.info("SERVER: get answer from TextHandler");
+        return fileOutput;
     }
 
     private void checkOutputFileIsDone() {

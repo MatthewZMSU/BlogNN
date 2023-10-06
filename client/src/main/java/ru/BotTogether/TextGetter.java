@@ -2,6 +2,7 @@ package ru.BotTogether;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,7 +20,9 @@ public class TextGetter {
 
     public static String getTextFromFileByPath(String path) {
         StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(path))))) {
+        try (InputStream inputStream = Files.newInputStream(Paths.get(path));
+             BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream))) {
+
             while (bf.ready()) {
                 stringBuilder.append((char) bf.read());
             }
