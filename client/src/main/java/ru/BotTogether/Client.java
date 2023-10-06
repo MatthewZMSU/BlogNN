@@ -39,7 +39,7 @@ public class Client {
             try (CloseableHttpResponse response = httpClient.execute(httpPost);) {
                 getResponse(response);
             } catch (Exception e) {
-                System.out.println("Закрываемся!");
+                System.out.println("Close for now!");
                 System.out.println(e.getMessage());
             }
         } catch (IOException e) {
@@ -63,13 +63,13 @@ public class Client {
         while (true) {
             try {
                 if (System.currentTimeMillis() - start >= 10_000) {
-                    throw new RuntimeException("Время ожидания > 10 секунд.");
+                    throw new RuntimeException("Waiting time more then 10 sec");
                 }
                 String responseBody = getResponseBody(response);
 
                 if (response.getStatusLine().getStatusCode() / 100 == 2) {
                     MessageDTO dto = objectMapper.readValue(responseBody, MessageDTO.class);
-                    System.out.println("Ответ модели: " + dto.getMessage());
+                    System.out.println("Model decision: " + dto.getMessage());
                 } else if (response.getStatusLine().getStatusCode() / 100 == 5) {
                     System.out.println(objectMapper.readValue(responseBody, ErrorDTO.class));
                 }

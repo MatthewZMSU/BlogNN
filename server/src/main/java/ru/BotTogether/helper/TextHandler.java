@@ -1,6 +1,5 @@
 package ru.BotTogether.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.apache.log4j.Logger;
 import ru.BotTogether.Server;
@@ -54,9 +53,8 @@ public class TextHandler {
 
 
     public String executePyCode(String text) {
-        //ignored s for now
         try {
-            String s = makeFileFromJson(fileInput, MessageDTO.makeJson(text));
+            makeFileFromJson(fileInput, MessageDTO.makeJson(text));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

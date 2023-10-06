@@ -9,7 +9,11 @@ import ru.BotTogether.helper.TextGetter;
 import ru.BotTogether.helper.TextHandler;
 import ru.BotTogether.helper.dto.ErrorDTO;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
