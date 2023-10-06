@@ -58,7 +58,7 @@ public class Server {
 
     private void handleServerLogic(HttpExchange exchange) throws IOException {
         if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-            System.out.println("Пришел НЕ POST запрос");
+            System.out.println("Got not POST request ");
             return;
         }
         log.info("SERVER: get POST-request");
