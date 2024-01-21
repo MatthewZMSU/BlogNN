@@ -5,7 +5,7 @@ import torch
 
 from torch import nn
 from torch.utils.data import Dataset, DataLoader
-from text_transforms import get_features
+from .text_transforms import get_features
 
 FEATURES_NUM = 770
 SAMPLES_NUM = 459

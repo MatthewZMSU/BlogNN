@@ -27,20 +27,17 @@ def _get_words(text: str) -> list[str]:
     return list(stemmed)
 
 
-def get_features(data: str | list[str],
-                 mode: str,
-                 fp: str) -> np.ndarray:
+def get_features(data: str | list[str]) -> dict:
     """
-    :param fp: defines where corpus is located
-    :param mode: parameter for defining behaviour
     :param data: str | list[str]. Text for encoding with tf-idf
     :return: np.ndarray. Array with required features
     """
-
     if isinstance(data, str):
         data = [data]
     if isinstance(data, list):
-        with open(fp, 'r') as f:
+        cur_dir = Path(inspect.stack()[0][1]).parent
+        corpus_file = os.path.join(cur_dir, '../JSONs/corpus.json')
+        with open(corpus_file, 'r') as f:
             corpus_info = json.load(f)
             total_documents = corpus_info['documents_number']
             key_words = corpus_info['key_words']
@@ -51,7 +48,7 @@ def get_features(data: str | list[str],
             words = _get_words(text)
             document_words = Counter(words)
             if document_words.total():
-                common_words = set(key_words).intersection(document_words.keys()) if mode == 'test' else {}
+                common_words = set(key_words).intersection(document_words.keys())
                 corpus_words.update(common_words)
 
                 for feature_ind, key in enumerate(key_words):
@@ -59,29 +56,7 @@ def get_features(data: str | list[str],
                     idf = np.log(total_documents / corpus_words[key])
                     features[text_ind][feature_ind] = tf * idf
                 corpus_words.subtract(common_words)
-        return features
-    raise ValueError(f'Incorrect type of data provided: {type(data)}')
-
-
-if __name__ == '__main__':
-    """
-        It's essential to provide text through 'message' key
-        in JSON file!
-        The output file contains 'features' key with list of
-        feature-numbers.
-        
-        Before running the script you need to provide 2 CL arguments:
-        source file and destination file names with the corresponding order.
-    """
-    cur_dir = Path(inspect.stack()[0][1]).parent
-    src_file = os.path.join(cur_dir, '../JSONs/' + sys.argv[1])
-    dst_file = os.path.join(cur_dir, '../JSONs/' + sys.argv[2])
-    corpus_file = os.path.join(cur_dir, '../JSONs/corpus.json')
-
-    with open(src_file, 'r') as f:
-        text = json.load(f)['message']
-    with open(dst_file, 'w') as f:
-        to_write = {
-            'features': get_features(text, mode='test', fp=corpus_file).tolist()[0]
+        return {
+            'features': features.tolist()[0]
         }
-        json.dump(to_write, f)
+    raise ValueError(f'Incorrect type of data provided: {type(data)}')
