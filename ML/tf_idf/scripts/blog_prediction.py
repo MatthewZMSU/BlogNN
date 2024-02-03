@@ -33,10 +33,3 @@ def model_predict(feature_list):
     matthew_probability = matthew_probability[0]
 
     return max_probability, matthew_probability
-
-    # print(f"Probabilities:")
-    # print(f"\t{max_probability * 100:.2f}% - Maxim's text")
-    # print(f"\t{matthew_probability * 100:.2f}% - Matthew's text")
-    # print()
-    # author = 'Maxim' if max_probability >= matthew_probability else 'Matthew'
-    # print(f"So I think that this text is written by: {author}")

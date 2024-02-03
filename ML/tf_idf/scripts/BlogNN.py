@@ -44,8 +44,8 @@ class BlogTextDataset(Dataset):
 
 def __define_label(author: str) -> int:
     """
-    Maxim -> 0
-    Matthew -> 1
+    Maxim <-> 0
+    Matthew <-> 1
     """
     if author == 'Максим Стрельцов':
         return 0

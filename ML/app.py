@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 
-from .scripts.text_transforms import get_features
-from .scripts.blog_prediction import model_predict
-
+from ML.tf_idf.scripts.text_transforms import get_features
+from tf_idf.scripts.blog_prediction import model_predict
 
 # model:
 

@@ -1,1 +1,18 @@
 This is an ML part. It is written on Python. And it contains ML models which predict authority of a given text.
+
+Directory scheme:
+ML+----------------------
+  +------ ml.txt -------- [this description]
+  +------ app.py -------- [FastAPI server]
+  +--+--- model_1 ------- [first model]
+     +--- __init__.py --- [functions to work with model]
+     +--- artifacts ----- [directory with artifacts of model: weights, JSONs, etc.]
+     +--- notebooks ----- [directory with important notebooks]
+     +--- scripts ------- [directory with Python stuff]
+  +------ ... -----------
+  +------ model_n -------
+  +------ data ---------- [directory with data and its corresponding scripts]
+  +------ security ------ [directory with encrypt-decrypt functions]
+
+The ML server must be run from ML directory with
+`uvicorn app:app`
